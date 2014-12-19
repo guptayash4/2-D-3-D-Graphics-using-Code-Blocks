@@ -1,0 +1,68 @@
+#include<iostream>
+#include<stdio.h>
+#include<stdlib.h>
+#include<GL/glut.h>
+void myInit()
+{
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0.0,600.0,0.0,400.0);
+    glClearColor(1.0,1.0,1.0,1.0);
+}
+void circlepoint(double x,double y)
+{
+
+    glBegin(GL_POINTS);
+     //glVertex2i(x,y);
+        glVertex2i(x+100,y+100);
+        glVertex2i(-x+100,-y+100);
+        glVertex2i(x+100,-y+100);
+        glVertex2i(-x+100,y+100);
+        glVertex2i(y+100,x+100);
+        glVertex2i(-y+100,-x+100);
+        glVertex2i(-y+100,x+100);
+        glVertex2i(y+100,-x+100);
+    glEnd();
+}
+void midpointcircle(double r)
+{
+    double d=(5/4)-r;
+    double x,y;
+    x=0;
+    y=r;
+    circlepoint(x,y);
+    while(y>x)
+    {
+        if(d<0)
+        {
+            d+=(double)(2*x)+3;
+        }
+        else
+        {
+            d+=(double)(2*x-2*y)+5;
+            y--;
+        }
+        x++;
+        circlepoint(x,y);
+    }
+}
+void mydisplay()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(0.0,0.0,0.0);
+    double r=50;
+    midpointcircle(r);
+    glFlush();
+}
+int main(int argc,char**argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_RGB|GLUT_SINGLE);
+    glutInitWindowSize(640,480);
+    glutInitWindowPosition(100,200);
+    glutCreateWindow("Circle");
+    glutDisplayFunc(mydisplay);
+    myInit();
+    glutMainLoop();
+    return 0;
+}
