@@ -1,0 +1,121 @@
+#include <stdio.h>
+#include <math.h>
+#include <windows.h>
+#include <GL/glut.h>
+
+int xs,ys,xe,ye;
+
+void PutPixel(int x,int y) {
+    glBegin(GL_POINTS);
+        glVertex2i(x,y);
+    glEnd();
+}
+
+void bresenham(void) {
+    glClear(GL_COLOR_BUFFER_BIT);
+    int x0=xs,y0=ys,x1=xe,y1=ye;
+    int x=x0,y=y0,k1,k2,d;
+    int dx=x1-x0, dy=y1-y0;
+    float m = (float) dy/dx;
+    if(m>=0) {
+        if(abs(dx)>=abs(dy)) {
+            glColor3f(1.0,0.0,0.0);
+            if(x0>x1)
+                x=x1,y=y1,x1=x0;
+            k1=2*abs(dy), k2=2*(abs(dy)-abs(dx));
+            d=2*abs(dy)-abs(dx);
+            PutPixel(x,y);
+            while(x<x1) {
+                x++;
+                if(d<0)
+                    d+=k1;
+                else {
+                    d+=k2;
+                    y++;
+                }
+                PutPixel(x,y);
+            }
+        }
+        else {
+            glColor3f(0.0,1.0,0.0);
+            if(y0>y1)
+                y=y1,x=x1,y1=y0;
+            k1=2*abs(dx), k2=2*(abs(dx)-abs(dy));
+            d=2*abs(dx)-abs(dy);
+            PutPixel(x,y);
+            while(y<y1) {
+                y++;
+                if(d<0)
+                    d+=k1;
+                else {
+                    d+=k2;
+                    x++;
+                }
+                PutPixel(x,y);
+            }
+        }
+    }
+    else {
+        if(abs(dx)>=abs(dy)) {
+            glColor3f(0.0,0.0,1.0);
+            if(x0<x1)
+                x=x1,y=y1,x1=x0;
+            k1=2*abs(dy), k2=2*(abs(dy)-abs(dx));
+            d=2*abs(dy)-abs(dx);
+            PutPixel(x,y);
+            while(x>x1) {
+                x--;
+                if(d<0)
+                    d+=k1;
+                else {
+                    d+=k2;
+                    y++;
+                }
+                PutPixel(x,y);
+            }
+        }
+        else {
+            glColor3f(0.0,0.0,0.0);
+            if(y0<y1)
+                y=y1,x=x1,y1=y0;
+            k1=2*abs(dx), k2=2*(abs(dx)-abs(dy));
+            d=2*abs(dx)-abs(dy);
+            PutPixel(x,y);
+            while(y>y1) {
+                y--;
+                if(d<0)
+                    d+=k1;
+                else {
+                    d+=k2;
+                    x++;
+                }
+                PutPixel(x,y);
+            }
+        }
+    }
+    glFlush();
+}
+
+void display(void) {
+    while(1) {
+        printf("\nEnter values for x0 y0 and x1 y1:- ");
+        scanf("%d%d%d%d",&xs,&ys,&xe,&ye);
+        if(xs==0&&ys==0&&xe==0&&ye==0)  exit(0);
+        bresenham();
+    }
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc,argv);
+    glutInitWindowSize(500,500);
+    glutInitWindowPosition(200,200);
+    glutCreateWindow("Bresenham");
+    glClearColor(1.0,1.0,1.0,0.0);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(-250.0,250.0,-250.0,250.0);
+    glutDisplayFunc(display);
+    glutMainLoop();
+    printf("Enter 0 0 0 0 to exit.");
+    return 0;
+}
