@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <math.h>
+#include <windows.h>
+#include <GL/glut.h>
+
+void floodfill(int x,int y,float fill[],float flood[]) {
+    float current[3];
+    glReadPixels(x,y,1.0,1.0,GL_RGB,GL_FLOAT,current);
+    if(current[0]==fill[0]&&current[1]==fill[1]&&current[2]==fill[2])
+        return;
+    if(current[0]!=flood[0]||current[1]!=flood[1]||current[2]!=flood[2])
+        return;
+    glColor3fv(fill);
+    glBegin(GL_POINTS);
+        glVertex2i(x,y);
+    glEnd();
+    glFlush();
+    floodfill(x+1,y,fill,flood);
+    floodfill(x-1,y,fill,flood);
+    floodfill(x,y+1,fill,flood);
+    floodfill(x,y-1,fill,flood);
+}
+
+void CirclePoints(int x,int y) {
+    glBegin(GL_POINTS);
+        glVertex2i(x+300,y+300);
+        glVertex2i(x+300,-y+300);
+        glVertex2i(-x+300,y+300);
+        glVertex2i(-x+300,-y+300);
+        glVertex2i(y+300,x+300);
+        glVertex2i(y+300,-x+300);
+        glVertex2i(-y+300,x+300);
+        glVertex2i(-y+300,-x+300);
+    glEnd();
+}
+
+void circle(int R,float rgb1,float rgb2,float rgb3) {
+    glColor3f(rgb1,rgb2,rgb3);
+    int x=0,y=R,d=1-R;
+    CirclePoints(x,y);
+    while(y>x) {
+        x++;
+        if(d<0)
+            d += 2*x+3;
+        else {
+            d += 2*x-2*y+5;
+            y--;
+        }
+        CirclePoints(x,y);
+    }
+    glFlush();
+}
+
+void square(int x1,int y1,int x2,int y2) {
+    glBegin(GL_POLYGON);
+        glVertex2i(x1+300,y1+300);
+        glVertex2i(x1+300,y2+300);
+        glVertex2i(x2+300,y2+300);
+        glVertex2i(x2+300,y1+300);
+    glEnd();
+    glFlush();
+}
+
+void display(void) {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(0.0,0.0,1.0);
+    square(-80,-80,80,80);
+    glColor3f(1.0,0.0,0.0);
+    square(-40,-40,-20,-20);
+    square(20,20,40,40);
+    square(-40,20,-20,40);
+    square(20,-40,40,-20);
+    float fill[3]={1.0,1.0,0.0};
+    float flood[3]={0.0,0.0,1.0};
+    floodfill(300,300,fill,flood);
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_RGB|GLUT_SINGLE);
+    glutInitWindowSize(600,600);
+    glutInitWindowPosition(400,100);
+    glutCreateWindow("Pixel");
+    glClearColor(1.0,1.0,1.0,1.0);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0.0,600.0,0.0,600.0);
+    glutDisplayFunc(display);
+    glutMainLoop();
+    return 0;
+}
