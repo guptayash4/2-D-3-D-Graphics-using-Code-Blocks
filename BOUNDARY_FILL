@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <math.h>
+#include <windows.h>
+#include <GL/glut.h>
+
+void boundaryfill(int x,int y,float fill[],float boundary[]) {
+    float current[3];
+    glReadPixels(x,y,1.0,1.0,GL_RGB,GL_FLOAT,current);
+    if(current[0]==fill[0]&&current[1]==fill[1]&&current[2]==fill[2])
+        return;
+    if(current[0]==boundary[0]&&current[1]==boundary[1]&&current[2]==boundary[2])
+        return;
+    glColor3fv(fill);
+    glBegin(GL_POINTS);
+        glVertex2i(x,y);
+    glEnd();
+    glFlush();
+    boundaryfill(x+1,y,fill,boundary);
+    boundaryfill(x-1,y,fill,boundary);
+    boundaryfill(x,y+1,fill,boundary);
+    boundaryfill(x,y-1,fill,boundary);
+}
+
+void EllipsePoints(int x,int y) {
+    glBegin(GL_POINTS);
+        glVertex2i(x+100,y+100);
+        glVertex2i(x+100,-y+100);
+        glVertex2i(-x+100,y+100);
+        glVertex2i(-x+100,-y+100);
+    glEnd();
+}
+
+void ellipse(int a,int b) {
+    double d1 = b*b + a*a/4 - a*a*b;
+    int x=0,y=b;
+    EllipsePoints(x,y);
+    while((float)a*a*(y-0.5)>(float)b*b*(x+1)) {
+        if(d1<0)
+            d1 += b*b*(2*x+3);
+        else {
+            d1 += b*b*(2*x+3)+a*a*(-2*y+2);
+            y--;
+        }
+        x++;
+        EllipsePoints(x,y);
+    }
+    double d2 = b*b*(x+0.5)*(x+0.5) + a*a*(y-1)*(y-1) - a*a*b*b;
+    while(y>0) {
+        if(d2<0) {
+            d2 += b*b*(2*x+2)+a*a*(3-2*y);
+            x++;
+        }
+        else
+            d2 += a*a*(3-2*y);
+        y--;
+        EllipsePoints(x,y);
+    }
+    glFlush();
+}
+
+void display(void) {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1.0,0.0,0.0);
+    ellipse(60,80);
+    float fill[3]={1.0,1.0,0.0};
+    float boundary[3]={1.0,0.0,0.0};
+    boundaryfill(100,100,fill,boundary);
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_RGB|GLUT_SINGLE);
+    glutInitWindowSize(250,250);
+    glutInitWindowPosition(200,200);
+    glutCreateWindow("Pixel");
+    glClearColor(1.0,1.0,1.0,1.0);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0.0,250.0,0.0,250.0);
+    glutDisplayFunc(display);
+    glutMainLoop();
+    return 0;
+}
