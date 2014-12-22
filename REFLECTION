@@ -1,0 +1,65 @@
+#include<iostream>
+#include<GL/glut.h>
+#include<math.h>
+#include<bits/stdc++.h>
+#include<windows.h>
+#include<time.h>
+int a[3][4]={{100,200,200,100},{100,100,200,200},{1,1,1,1}};
+void mydisplay();
+void myinit()
+{
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(-600,600,-400,400);
+    glClearColor(1.0,1.0,1.0,1.0);
+}
+void mykey(unsigned char k,int x,int y)
+{
+    int temp[3][4];
+    for(int i=0;i<3;i++)
+     for(int j=0;j<4;j++)
+      temp[i][j]=0;
+
+
+    if(k=='r');
+     {
+         int ref[3][3]={{-1,0,0},{0,-1,0},{0,0,1}};
+         for(int i=0;i<3;i++)
+          for(int j=0;j<4;j++)
+            for(int k=0;k<3;k++)
+              temp[i][j]+=ref[i][k]*a[k][j];
+
+
+          for(int i=0;i<3;i++)
+          for(int j=0;j<4;j++)
+           a[i][j]=temp[i][j];
+
+           mydisplay();
+
+     }
+}
+void mydisplay()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1.0,0.0,0.0);
+     glBegin(GL_POLYGON);
+      glVertex2i(a[0][0],a[1][0]);
+      glVertex2i(a[0][1],a[1][1]);
+      glVertex2i(a[0][2],a[1][2]);
+      glVertex2i(a[0][3],a[1][3]);
+     glEnd();
+    glFlush();
+}
+int main(int argc,char **argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_RGB|GLUT_SINGLE);
+    glutInitWindowSize(640,480);
+    glutInitWindowPosition(200,200);
+    glutCreateWindow("line algo");
+    glutDisplayFunc(mydisplay);
+    glutKeyboardFunc(mykey);
+    myinit();
+    glutMainLoop();
+    return 0;
+}
